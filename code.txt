@@ -1,0 +1,46 @@
+Code Chunks
+
+Chunk 1
+---------------------------------------------------------
+Commands to read in osm data
+Cd C:\osm2pgsql-bin\
+-- set directory to folder containing osm2pgsql
+osm2pgsql -d urban_greenspaces -U postgres -W C:\Users\adela\Documents\Assignments\IDCE376\misc_data\baltimore.pbf
+-- read pbf file into urban greenspaces database
+---------------------------------------------------------
+
+
+SQL 1
+---------------------------------------------------------
+-- SQL code used to visualize polygons in pgadmin4 and filter out parks with null names
+SELECT osm_id, name, way, ST_Area(way) as area
+FROM planet_osm_polygon
+WHERE (leisure = 'park' and name is not null)
+ORDER BY area DESC;
+---------------------------------------------------------
+
+SQL 2: Create Data table
+---------------------------------------------------------
+CREATE TABLE green_spaces (
+id SERIAL PRIMARY KEY,           -- set id paramaters
+name VARCHAR(255),               -- set name paramaters
+location GEOMETRY(Point, 4326),  -- set geometry paramaters (transforming polygons to points)
+area_sq_m NUMERIC                -- Set paramaters for area column 
+);
+
+INSERT INTO green_spaces (name, location, area_sq_m)                     -- identify columns to fill
+SELECT	name, ST_Transform(ST_Centroid(way), 4326) as locn, ST_Area(way) -- fill columns with values
+FROM	planet_osm_polygon                                               -- identify table to retreive data from
+WHERE	leisure	= 'park' and name is not null;                           -- filter to parks with valid names
+---------------------------------------------------------
+
+SQL 3: Create Summary Statistics table
+---------------------------------------------------------
+SELECT COUNT(*) AS n_parks,                          -- calculate number of parks
+round(SUM(area_sq_m)/1e6, 2) AS totalarea_sqkm,      -- calculate total area in sq km
+round(AVG(area_sq_m), 0) as avgarea_sqm,             -- calculate mean area in sq m
+round(max(area_sq_m)) as max_area,                   -- display area of largest park
+round (min(area_sq_m)) as min_area                   -- display area of smallest park
+FROM green_spaces;
+---------------------------------------------------------
+
