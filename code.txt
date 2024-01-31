@@ -29,7 +29,7 @@ area_sq_m NUMERIC                -- Set paramaters for area column
 );
 
 INSERT INTO green_spaces (name, location, area_sq_m)                     -- identify columns to fill
-SELECT	name, ST_Transform(ST_Centroid(way), 4326) as locn, ST_Area(way) -- fill columns with values
+SELECT	name, ST_Transform(ST_Centroid(way), 4326) as locn, ST_Area(way) -- fill colums, get centroids of polygons and transform crs
 FROM	planet_osm_polygon                                               -- identify table to retreive data from
 WHERE	leisure	= 'park' and name is not null;                           -- filter to parks with valid names
 ---------------------------------------------------------
@@ -44,3 +44,28 @@ round (min(area_sq_m)) as min_area                   -- display area of smallest
 FROM green_spaces;
 ---------------------------------------------------------
 
+---------------------------------------------------------
+select name, round(area_sq_m, 2) as area
+from green_spaces
+order by area asc
+limit 5;
+
+select name, round((area_sq_m/1e6), 2) as area
+from green_spaces
+order by area desc
+limit 5;
+---------------------------------------------------------
+
+---------------------------------------------------------
+CREATE TABLE green_spaces_poly (
+id SERIAL PRIMARY KEY,           -- set id paramaters
+name VARCHAR(255),               -- set name paramaters
+location GEOMETRY(polygon, 4326),  -- set geometry paramaters (transforming polygons to points)
+area_sq_m NUMERIC                -- Set paramaters for area column 
+);
+
+INSERT INTO green_spaces_poly (name, location, area_sq_m)                     -- identify columns to fill
+SELECT	name, ST_Transform((way), 4326) as locn, ST_Area(way) -- fill columns with values
+FROM	planet_osm_polygon                                               -- identify table to retreive data from
+WHERE	leisure	= 'park' and name is not null; 
+---------------------------------------------------------
