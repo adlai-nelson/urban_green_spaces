@@ -3,6 +3,7 @@ Adlai Nelson
 
 
 Contents:
-- code.txt (Contains record of functions required to read in, clean, and analyze data)
 - code.sql (Contains code for SQL queries)
 - analysis_report.docx (report contianing detailed methods and results)
+- code.txt (Contains record of functions required to read in, clean, and analyze data)
+- greenspaces.pdf (Visualization of Baltimore greenspaces)
